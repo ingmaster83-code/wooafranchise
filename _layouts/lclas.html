@@ -1,0 +1,29 @@
+---
+layout: default
+---
+<div class="hero">
+  <h1>{{ page.lclas }} 업종<br><span class="accent">프랜차이즈 창업비용</span></h1>
+  <p>{{ page.lclas }} 업종 {{ page.totalCount }}개 브랜드의 창업비용을 세부 업종별로 확인하세요.</p>
+</div>
+
+<div class="breadcrumb">
+  <a href="{{ '/' | relative_url }}">홈</a> ›
+  <a href="{{ '/industry/' | relative_url }}">업종별</a> ›
+  <span>{{ page.lclas }}</span>
+</div>
+
+<div class="section">
+  <h2 class="section-title">세부 업종 선택</h2>
+  <p class="section-sub">총 {{ page.mlsfcList.size }}개 세부 업종 · {{ page.totalCount }}개 브랜드</p>
+  <div class="region-grid">
+    {% for m in page.mlsfcList %}
+    <a class="region-btn" href="{{ '/industry/' | relative_url }}{{ page.lclas }}/{{ m.name }}/">
+      <span class="region-icon">🏷️</span>
+      {{ m.name }}
+      <div class="region-count">{{ m.count }}개</div>
+    </a>
+    {% endfor %}
+  </div>
+
+  <div class="ad-slot" style="margin:28px 0;text-align:center;">{% include ad.html %}</div>
+</div>

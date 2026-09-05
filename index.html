@@ -1,0 +1,118 @@
+---
+layout: default
+title: 우아프랜차이즈 - 전국 가맹점 창업비용 정보
+description: 전국 11,000여 개 프랜차이즈 브랜드의 가맹비·교육비·보증금 등 실제 창업비용과 가맹점 현황·평균매출까지 한 곳에서 확인하세요.
+---
+
+<div class="hero" id="search">
+  <h1>그 브랜드,<br><span class="accent">창업비용이 얼마일까?</span></h1>
+  <p>전국 11,000여 개 프랜차이즈의 가맹비·교육비·보증금 등<br>실제 창업비용과 평균매출까지 한 곳에서 확인하세요.</p>
+
+  <div class="search-wrap">
+    <input type="text" class="search-input" id="searchInput" placeholder="브랜드 이름으로 검색 (예: 메가커피, 이디야, 교촌치킨...)">
+    <button class="search-btn" id="searchBtn">🔍 검색</button>
+  </div>
+</div>
+
+<div id="search-results"></div>
+
+<div class="top-ad-bar">{% include ad.html %}</div>
+
+<div class="section" id="industrySection">
+  <h2 class="section-title">🏷️ 업종별로 찾기</h2>
+  <p class="section-sub">업종을 선택하면 세부 업종별 브랜드 목록을 볼 수 있어요.</p>
+  <div class="region-grid">
+    {% assign lclasList = site.data.brand_by_lclas | sort %}
+    {% for pair in lclasList %}
+    <a class="region-btn" href="{{ '/industry/' | relative_url }}{{ pair[0] }}/">
+      <span class="region-icon">🏪</span>
+      {{ pair[0] }}
+      <div class="region-count">{{ pair[1].size }}개</div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="section" style="padding-top:0;">
+  <div class="info-panel">
+    <h2>🏪 우아프랜차이즈는 이런 정보를 제공해요</h2>
+    <p style="color:var(--text-muted);">공정거래위원회 가맹사업정보제공시스템(정보공개서) 공공데이터를 바탕으로, 전국 프랜차이즈 브랜드의 <strong>가맹비·교육비·보증금 등 실제 창업비용</strong>과 가맹점 수, 평균매출액 정보를 한 곳에 정리했습니다. 지도 서비스나 프랜차이즈 홍보 페이지에는 없는, 공식 등록 데이터 기준의 비용 정보를 확인해보세요.</p>
+  </div>
+</div>
+
+<div class="section" style="padding-top:0;">
+  <div class="tips-panel">
+    <h3>💡 Tips</h3>
+    <ul>
+      <li>브랜드명 일부만 입력해도 검색돼요 (예: "커피"로 검색하면 관련 브랜드가 다 나와요).</li>
+      <li>창업비용에는 인테리어·설비비가 별도로 붙는 경우가 많으니 꼭 확인하세요.</li>
+      <li>평균매출액은 가맹점 전체 평균이라 상권에 따라 실제와 차이가 클 수 있어요.</li>
+    </ul>
+  </div>
+  <div class="faq-section">
+    <h2>자주 묻는 질문</h2>
+    <details>
+      <summary>모든 프랜차이즈 브랜드가 검색되나요?</summary>
+      <p>공정거래위원회에 정보공개서를 등록한 전국 프랜차이즈 브랜드를 대상으로 합니다.</p>
+    </details>
+    <details>
+      <summary>창업비용 정보는 정확한가요?</summary>
+      <p>가맹본부가 공정거래위원회에 등록한 정보공개서 기준이며, 실제 계약 시 조건이 달라질 수 있습니다. 계약 전 반드시 정보공개서 원문과 가맹본부 설명을 확인하세요.</p>
+    </details>
+    <details>
+      <summary>파일이나 개인정보가 서버에 저장되나요?</summary>
+      <p>아니요. 검색은 브라우저 안에서 처리되며 별도의 개인정보를 수집하지 않습니다.</p>
+    </details>
+  </div>
+</div>
+
+<script>
+var searchIndex = null;
+var fuse = null;
+
+function ensureFuseLoaded(cb) {
+  if (window.Fuse) return cb();
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js';
+  s.onload = cb;
+  document.head.appendChild(s);
+}
+
+function ensureIndexLoaded(cb) {
+  if (searchIndex) return cb();
+  fetch('{{ "/search_index.json" | relative_url }}').then(function(r){ return r.json(); }).then(function(data){
+    searchIndex = data;
+    cb();
+  });
+}
+
+function doSearch() {
+  var q = document.getElementById('searchInput').value.trim();
+  var resultsEl = document.getElementById('search-results');
+  if (!q) { resultsEl.innerHTML = ''; document.getElementById('industrySection').style.display = ''; return; }
+
+  ensureFuseLoaded(function () {
+    ensureIndexLoaded(function () {
+      if (!fuse) {
+        fuse = new Fuse(searchIndex, { keys: ['n'], threshold: 0.32, minMatchCharLength: 1 });
+      }
+      var hits = fuse.search(q).slice(0, 30);
+      document.getElementById('industrySection').style.display = 'none';
+      if (hits.length === 0) {
+        resultsEl.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:30px 0;">검색 결과가 없어요. 브랜드명을 다시 확인해보세요.</p>';
+        return;
+      }
+      resultsEl.innerHTML = hits.map(function (h) {
+        var it = h.item;
+        var badge = it.f ? '<span class="apt-card-badge badge-ready">창업비용 있음</span>' : '<span class="apt-card-badge badge-pending">준비중</span>';
+        return '<div class="search-result-item"><a href="{{ "/brand/" | relative_url }}' + it.s + '/">' +
+          '<span><span class="search-result-name">' + it.n + '</span><br><span class="search-result-loc">' + it.c + ' · ' + it.l + ' ' + it.m + '</span></span>' +
+          badge + '</a></div>';
+      }).join('');
+    });
+  });
+}
+
+document.getElementById('searchBtn').addEventListener('click', doSearch);
+document.getElementById('searchInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') doSearch(); });
+</script>

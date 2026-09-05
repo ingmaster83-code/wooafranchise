@@ -1,0 +1,30 @@
+title: 우아프랜차이즈 - 전국 가맹점 창업비용 정보
+description: >-
+  전국 11,000여 개 프랜차이즈 브랜드의 가맹비·교육비·보증금 등 실제 창업비용과
+  가맹점 현황·평균매출까지 한 곳에서 확인하세요.
+url: "https://wooafranchise.wooahouse.com"
+baseurl: ""
+lang: ko
+timezone: Asia/Seoul
+author: WooaHouse
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+
+plugins:
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - scripts/
+  - "*.py"
+  - "*.log"
+  - "*.txt"
+  - README.md
+  - .gitignore
+  - vendor/
+  - .env

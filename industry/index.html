@@ -1,0 +1,27 @@
+---
+layout: default
+title: 업종별 프랜차이즈 창업비용 찾기
+description: 외식·서비스·도소매 업종별 프랜차이즈 브랜드 목록과 창업비용을 확인하세요.
+---
+
+<div class="hero">
+  <h1>업종별<br><span class="accent">프랜차이즈 찾기</span></h1>
+  <p>업종을 선택하면 세부 업종별 브랜드 목록을 볼 수 있어요.</p>
+</div>
+
+<div class="breadcrumb">
+  <a href="{{ '/' | relative_url }}">홈</a> › <span>업종별</span>
+</div>
+
+<div class="section">
+  <div class="region-grid">
+    {% assign lclasList = site.data.brand_by_lclas | sort %}
+    {% for pair in lclasList %}
+    <a class="region-btn" href="{{ '/industry/' | relative_url }}{{ pair[0] }}/">
+      <span class="region-icon">🏪</span>
+      {{ pair[0] }}
+      <div class="region-count">{{ pair[1].size }}개</div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
