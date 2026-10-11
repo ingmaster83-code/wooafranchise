@@ -8,13 +8,18 @@ fetch_hq_detail.py - 가맹본부 일반 상세정보(주소/대표자/전화/�
 import json, os, sys, time, argparse
 import requests
 
+def _need_key():
+    import os, sys
+    return os.environ.get("DATA_GO_KR_API_KEY") or sys.exit("환경변수 DATA_GO_KR_API_KEY 가 필요합니다(키를 코드에 넣지 마세요).")
+
+
 sys.stdout.reconfigure(encoding="utf-8")
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAW_LIST = os.path.join(ROOT, "_rawdata", "brand_list_raw.json")
 CACHE = os.path.join(ROOT, "_rawdata", "hq_detail.json")
 
-SERVICE_KEY = os.environ.get("DATA_GO_KR_API_KEY") or "9490b1d34e92aa9e25b32a4cff1438fc7b9c71e5d332413916a391e867f61e86"
+SERVICE_KEY = os.environ.get("DATA_GO_KR_API_KEY") or _need_key()
 BASE = "https://apis.data.go.kr/1130000/FftcJnghdqrtrsGnrlDtl3_Service/getjnghdqrtrsGnlinfo2"
 YEAR = os.environ.get("FRANCHISE_YEAR", "2024")
 DEFAULT_LIMIT = 9000
