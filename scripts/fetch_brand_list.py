@@ -6,6 +6,7 @@ fetch_brand_list.py - 공정거래위원회 가맹정보 브랜드 목록(FftcBr
 출력: _rawdata/brand_list_raw.json
 """
 import json, os, sys, time
+import sys as _s, pathlib as _p; _s.path.insert(0, str(_p.Path(__file__).parent)); import blocklist as BL
 import requests
 
 def _need_key():
@@ -68,7 +69,7 @@ def main():
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
-        json.dump(all_items, f, ensure_ascii=False)
+        json.dump([b for b in all_items if not BL.blocked_brand(b)], f, ensure_ascii=False)
     print(f"\n총 {len(all_items)}건 저장 -> {OUT}")
 
 

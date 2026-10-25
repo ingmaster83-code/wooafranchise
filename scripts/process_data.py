@@ -14,6 +14,8 @@ JSON으로 가공한다.
   _rawdata/stats.json
 """
 import json, re, hashlib, sys
+sys.path.insert(0, str(__import__('pathlib').Path(__file__).parent))
+import blocklist as BL
 from pathlib import Path
 from collections import defaultdict, Counter
 
@@ -68,6 +70,12 @@ def main():
     stats_raw = load(RAW_STATS, [])
     fee_map = load(RAW_FEE, {})
     hq_map = load(RAW_HQ, {})
+    # 삭제 요청 대상 제외(scripts/blocklist.json)
+    blocked_corp = {(b.get('corpNm'), b.get('brandNm')) for b in brands if BL.blocked_brand(b)}
+    brands = [b for b in brands if not BL.blocked_brand(b)]
+    stats_raw = [x for x in stats_raw if (x.get('corpNm'), x.get('brandNm')) not in blocked_corp and (x.get('corpNm'), x.get('brandNm')) not in BL.STATS]
+    fee_map = {k: v for k, v in fee_map.items() if k not in BL.BRAND and v.get('jnghdqrtrsMnno') not in BL.HQ}
+    hq_map = {k: v for k, v in hq_map.items() if k not in BL.HQ and v.get('brno') not in BL.BRNO}
 
     stats_by_key = {}
     for s in stats_raw:
