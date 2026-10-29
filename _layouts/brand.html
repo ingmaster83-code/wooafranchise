@@ -51,6 +51,26 @@ layout: default
     {% endif %}
   </div>
 
+  {% if page.cmp %}
+  <div class="info-panel">
+    <h2>📈 {{ page.mlsfc }} 업종 평균과 비교</h2>
+    <p style="font-size:.92rem;line-height:1.75;color:#374151;margin:0 0 8px;">{{ page.cmp.text }}</p>
+    {% if page.cmp.salesText %}<p style="font-size:.9rem;line-height:1.75;color:#374151;margin:0 0 8px;">{{ page.cmp.salesText }}</p>{% endif %}
+    {% if page.cmp.peers.size > 0 %}
+    <h3 style="font-size:.95rem;font-weight:700;margin:14px 0 8px;">창업비용이 비슷한 {{ page.mlsfc }} 브랜드</h3>
+    <div class="apt-grid">
+      {% for pr in page.cmp.peers %}
+      <a class="apt-card" href="{{ '/brand/' | relative_url }}{{ pr.slug }}/">
+        <div class="apt-card-name">{{ pr.brandNm }}</div>
+        <div class="apt-card-stats"><span>💰 약 {{ pr.cost }}</span>{% if pr.frcs %}<span>🏪 가맹점 {{ pr.frcs }}개</span>{% endif %}</div>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <p style="margin-top:12px;font-size:.85rem;"><a href="{{ '/industry/' | relative_url }}{{ page.lclas }}/{{ page.mlsfc }}/">{{ page.mlsfc }} 프랜차이즈 {{ page.cmp.n }}곳 전체 비교 →</a></p>
+  </div>
+  {% endif %}
+
   <div class="info-panel">
     <h2>🏢 가맹본부 정보</h2>
     {% if page.hasHq %}
@@ -76,6 +96,8 @@ layout: default
   <div class="notice-box" style="margin-top:14px;">
     💡 본 정보는 공정거래위원회 가맹사업정보제공시스템 공공데이터(정보공개서) 기준입니다. 실제 계약 조건은 가맹본부와 직접 협의 시 달라질 수 있으니, 계약 전 반드시 정보공개서 원문을 확인하세요.
   </div>
+
+  {% include startup_support.html %}
 
   <div class="tips-panel">
     <h3>💡 Tips</h3>
