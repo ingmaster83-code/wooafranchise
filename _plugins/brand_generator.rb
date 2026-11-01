@@ -1,4 +1,5 @@
 require 'json'
+require 'erb'
 
 module Jekyll
   module FrcUtil
@@ -76,6 +77,41 @@ module Jekyll
       end
       { 'text' => text, 'salesText' => sales_txt, 'peers' => peer_rows, 'n' => comma(sm['n']), 'rank' => rank,
         'avgText' => fmt(sm['avg']), 'selfText' => fmt(m) }
+    end
+  end
+
+  # ── 다른 우아 사이트(상권·경비율·대출)로 가는 연결 ──────────────────
+  module XLinks
+    SG = 'https://wooasanggwon.wooahouse.com'
+    GB = 'https://wooagyeongbi.wooahouse.com'
+    GB_CAT = { '외식' => '음식', '도소매' => '소매', '서비스' => '서비스' }.freeze
+
+    def self.enc(s)
+      ERB::Util.url_encode(s)
+    end
+
+    def self.biz_links(site, mlsfc, limit)
+      names = ((site.data['sanggwon'] || {})['biz'] || {})[mlsfc] || []
+      names.first(limit).map { |n| { 'label' => "전국 #{n} 점포 현황", 'url' => "#{SG}/biz/#{enc(n)}/" } }
+    end
+
+    def self.gyeongbi(lclas)
+      cat = GB_CAT[lclas]
+      cat ? { 'label' => "#{cat}업 경비율·종합소득세", 'url' => "#{GB}/category/#{enc(cat)}/" } : nil
+    end
+
+    def self.for_brand(site, it)
+      out = {}
+      d = ((site.data['sanggwon'] || {})['brands'] || {})[it['brandNm']]
+      out['brand'] = { 'label' => "#{it['brandNm']} 전국 매장 수·지역별 분포", 'url' => "#{SG}/brand/#{enc(d)}/" } if d
+      out['biz'] = biz_links(site, it['mlsfc'], 2)
+      out['gb'] = gyeongbi(it['lclas'])
+      m = FrcStats.mid(it['smtnAmt'])
+      if m && m > 0
+        l = TaxLinks.loan_half(m * 10_000)
+        out['loan'] = { 'label' => "창업비용의 절반(#{l['label']})을 빌릴 때 월 상환액", 'url' => l['url'] } if l
+      end
+      out['biz'].empty? && !out['brand'] && !out['gb'] && !out['loan'] ? nil : out
     end
   end
 
@@ -176,6 +212,8 @@ module Jekyll
       self.data['items'] = items.sort_by { |it| it['brandNm'] }
       self.data['totalCount'] = items.size
       list = (site.data['frc_groups'] || {})[[lclas, mlsfc]]
+      self.data['xlBiz'] = XLinks.biz_links(site, mlsfc, 4)
+      self.data['xlGb'] = XLinks.gyeongbi(lclas)
       if list && list.size >= FrcStats::MIN_GROUP
         sm = FrcStats.group_summary(list)
         self.data['summary'] = "#{mlsfc} 업종에서 창업비용을 공개한 브랜드 #{FrcStats.comma(sm['n'])}곳의 평균 총 창업비용은 약 #{FrcStats.fmt(sm['avg'])}입니다. 가장 낮은 곳은 #{sm['low'][1]['brandNm']}(약 #{FrcStats.fmt(sm['low'][0])}), 가장 높은 곳은 #{sm['high'][1]['brandNm']}(약 #{FrcStats.fmt(sm['high'][0])})입니다."
@@ -209,6 +247,7 @@ module Jekyll
       self.read_yaml(File.join(@base, '_layouts'), 'brand.html')
       self.data.merge!(it)
       self.data['cmp'] = FrcStats.compare(site.data['frc_groups'] || {}, it)
+      self.data['xl'] = XLinks.for_brand(site, it)
       self.data['layout'] = 'brand'
       self.data['title'] = "#{it['brandNm']} 가맹비·창업비용 — #{it['mlsfc']} | #{it['corpNm']}"
       extra = it['smtnAmt'] ? "총 창업비용 약 #{it['smtnAmt']}, " : ""

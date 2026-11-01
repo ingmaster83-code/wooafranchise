@@ -46,6 +46,15 @@ layout: default
     {% endfor %}
   </div>
   <p id="noResult" style="display:none;text-align:center;color:var(--text-muted);padding:30px 0;">검색 결과가 없어요.</p>
+  {% if page.xlBiz.size > 0 or page.xlGb %}
+  <div class="info-panel" style="margin-top:14px;">
+    <h2>🔗 {{ page.mlsfc }} 창업 전에 함께 확인하세요</h2>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      {% for b in page.xlBiz %}<a href="{{ b.url }}" style="display:inline-block;padding:8px 16px;border:1.5px solid var(--primary);border-radius:20px;font-size:.85rem;font-weight:600;">📍 {{ b.label }} →</a>{% endfor %}
+      {% if page.xlGb %}<a href="{{ page.xlGb.url }}" style="display:inline-block;padding:8px 16px;border:1.5px solid var(--primary);border-radius:20px;font-size:.85rem;font-weight:600;">🧾 {{ page.xlGb.label }} →</a>{% endif %}
+    </div>
+  </div>
+  {% endif %}
   {% include startup_support.html %}
 </div>
 </div>

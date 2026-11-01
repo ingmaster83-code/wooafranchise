@@ -1,0 +1,13 @@
+{% assign xl = page.xl %}{% if xl %}
+<div class="info-panel" style="margin-top:14px;">
+  <h2>🔗 창업 전에 함께 확인하세요</h2>
+  <p style="font-size:.9rem;line-height:1.75;color:#374151;margin:0 0 10px;">매장이 들어설 동네의 같은 업종 점포 현황, 창업 후 세금(경비율), 창업자금 대출 이자를 한 번에 확인할 수 있습니다.</p>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;">
+    {% if xl.brand %}<a href="{{ xl.brand.url }}" style="display:inline-block;padding:8px 16px;border:1.5px solid var(--primary);border-radius:20px;font-size:.85rem;font-weight:600;">🗺️ {{ xl.brand.label }} →</a>{% endif %}
+    {% for b in xl.biz %}<a href="{{ b.url }}" style="display:inline-block;padding:8px 16px;border:1.5px solid var(--primary);border-radius:20px;font-size:.85rem;font-weight:600;">📍 {{ b.label }} →</a>{% endfor %}
+    {% if xl.gb %}<a href="{{ xl.gb.url }}" style="display:inline-block;padding:8px 16px;border:1.5px solid var(--primary);border-radius:20px;font-size:.85rem;font-weight:600;">🧾 {{ xl.gb.label }} →</a>{% endif %}
+    {% if xl.loan %}<a href="{{ xl.loan.url }}" style="display:inline-block;padding:8px 16px;border:1.5px solid var(--primary);border-radius:20px;font-size:.85rem;font-weight:600;">💳 {{ xl.loan.label }} →</a>{% endif %}
+  </div>
+  {% if xl.loan %}<p style="margin-top:8px;font-size:.8rem;color:#6B7280;">대출 구간은 총 창업비용의 절반을 빌린다고 가정한 예시이며, 실제 한도·금리는 심사 결과에 따라 달라집니다.</p>{% endif %}
+</div>
+{% endif %}
